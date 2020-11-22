@@ -60,8 +60,8 @@ class Board {
         }, 16);
 
         setInterval(() => {
-            this.observeStones();
             this.gravity();
+            this.observeStones();
         }, 120);
     }
 
@@ -83,11 +83,13 @@ class Board {
             const block = this.getBlock(point);
 
             if (specialMap.indexOf(block) !== -1) {
+                const under = this.getBlock({x: point.x , y: point.y - 1});
+
                 if (this.isInBounds({x: point.x - 1, y: point.y + 1})) {
                     if ((this.getBlock({x: point.x - 1, y: point.y}) == AIR) && (this.getBlock({
                         x: point.x - 1,
                         y: point.y + 1
-                    }) == AIR)) {
+                    }) == AIR) && (this.getBlock(under) !== GRASS)) {
                         this.setBlock(point, AIR);
                         this.setBlock({x: point.x - 1, y: point.y}, specialMap[specialMap.indexOf(block)])
                     }
@@ -96,7 +98,7 @@ class Board {
                     if ((this.getBlock({x: point.x + 1, y: point.y}) == AIR) && (this.getBlock({
                         x: point.x + 1,
                         y: point.y + 1
-                    }) == AIR)) {
+                    }) == AIR) && (this.getBlock(under) !== GRASS)) {
                         this.setBlock(point, AIR);
                         this.setBlock({x: point.x + 1, y: point.y}, specialMap[specialMap.indexOf(block)])
                     }
@@ -130,7 +132,6 @@ class Board {
     setPlayerPosition(newPosition) {
         if (!this.isInBounds(newPosition)) return;
 
-        console.log('new: ', newPosition)
         const nextBlock = this.getBlock(newPosition);
         if (nextBlock === STONE) {
             const next = this.getBlock({x: newPosition.x + 1, y: newPosition.y});
@@ -182,7 +183,7 @@ class Board {
         this.iteration((point) => {
             i++;
             setTimeout(() => {
-                this.setBlock(point, NULL);
+                this.setBlock(point, 'W');
             }, 20 * i);
         })
     }
@@ -209,8 +210,6 @@ class Board {
         this.playerHearts = 0;
 
         this.iteration((point) => {
-            console.log(this.playerHearts, this.heartsToComplete)
-
             const block = this.getBlock(point);
             if (block === HEART) {
                 this.heartsToComplete++
@@ -227,7 +226,6 @@ class Board {
     restartLevel() {
         this.mapArr = deepCopy(this.level);
         this.initBlocks();
-
     }
 
     printBoard() {
@@ -237,7 +235,8 @@ class Board {
             for (let x = 0; x < this.width; x++) {
                 row += this.getBlock({x, y})
             }
-            this.container.innerHTML += row + '\n'
+            this.container.innerHTML += row + `
+            `
         }
     }
 }

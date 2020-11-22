@@ -19,5 +19,5 @@ export default {
             name: 'heartlight'
         }
     ],
-    plugins: [typescript(), terser()]
+    plugins: [typescript({target: 'es2020'}), terser()]
 }
